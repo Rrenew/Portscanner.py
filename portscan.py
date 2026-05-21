@@ -52,6 +52,15 @@ def parse_args() -> argparse.Namespace:
                         help='Scan only the top 10,000 most common ports')
     return parser.parse_args()
 
-if __name__ == '__main__':
-    print(ART)
-    args = parse_args()
+
+
+def get_timeout(host: str) -> float:
+    try:
+        result = ping(target=host, count=2, timeout=5)
+        return float(result.rtt_avg_ms) + 80
+    except KeyboardInterrupt:
+        print(f'\n{clr.RED}[!]{clr.RESET} Scan interrupted by user. Exiting\n')
+        sys.exit(0)
+    except Exception as exc:
+        print(f'\n{clr.RED}[!] FATAL-ERROR:{clr.RESET} {exc}\n')
+        sys.exit(1)
