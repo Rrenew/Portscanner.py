@@ -64,3 +64,39 @@ def get_timeout(host: str) -> float:
     except Exception as exc:
         print(f'\n{clr.RED}[!] FATAL-ERROR:{clr.RESET} {exc}\n')
         sys.exit(1)
+
+class PortScanner:
+    def __init__(self, host: str,
+                 timeout_ms: float, num_threads: int,
+                 output: str | None, use_top10k: bool):
+             self.host = host
+             self.timeout = timeout_ms
+             self.num_threads = num_threads
+             self.output = output
+
+             port_list = TOP10k if use_top10k else TOP1k
+             self.port_quere: queue.Queue[int] = queue.Queue()
+             for p in port_list:
+                self.port_quere.put(p)
+
+             self.result_lock = threading.Lock()   
+             self.file_lock = threading.Lock()
+
+             self.open_ports: list[int] = []
+             self.error: str | None = None
+             self.stop_event = threading.Event()
+
+    def run(self) -> list[int]:
+        threads = [
+            threading.Thread(target=self.worke, daemon=True)
+            for _ in range(self.num_threads)
+        ]    
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        if self.error:
+            print(self.error)
+            sys.exit(1)
+
+        return self.open_ports
