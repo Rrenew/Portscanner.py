@@ -99,4 +99,4 @@ class PortScanner:
             print(self.error)
             sys.exit(1)
 
-        return self.open_ports
+        return sorted(self.open_ports)
