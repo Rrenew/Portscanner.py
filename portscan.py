@@ -100,3 +100,36 @@ class PortScanner:
             sys.exit(1)
 
         return sorted(self.open_ports)
+
+    def _worker(self):
+        while not self.stop_event.is_set():
+            try:
+                port = self.port_quere.get_nowait()
+            except queue.Empty:
+                break
+            self._probe(port)
+    
+    def _probe(self, port: int):        
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(self.timeout_ms / 1000)
+                status = sock.connect_ex((self.host, port))
+                
+            if status == 0:
+               self._register_open(port)
+
+        except KeyboardInterrupt:
+            self.stop_event.set()
+            print(f'\n{clr.RED}[!]{clr.RESET} Scan interrupted by user.\n')
+            sys.exit(0)
+
+        except socket.gaierror:
+           self.stop_event().set()
+           with self.result_lock:
+               self.error = (f'\n{clr.RED}[!] FATAL-ERROR:{clr.RESET} Please verify the domain || getaddrinfo failed {self.host}\n')
+
+        except OSError:
+            pass       
+
+
+    def _register_open(self, port: int):    
