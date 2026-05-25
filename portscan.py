@@ -36,7 +36,9 @@ ART = """\n
 ⣠⠤⠔⠒⠚⠉⠁⠀⠀⠀⠀⠀⠀⠀⢹⡆⠀⠀⠀⠀⠉⠻⣿⣿⣿⣯⣥⣤⣤⣶⣿⣿⡿⠋⣠⡿⠁⠀⠀⠁⠲⢈⣿⣿⣷⣤⣄⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀⠤⡄⠀⠀⠀⠀⠉⡻⢿⣧⣿⣿⡟⢋⣤⡾⠋⠀⠀⠀⠀⠘⠛⢺⣿⣿⣿⣿⣿⣷⣤⣤
 ⡀⠀⣀⣀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⣈⣳⣦⣤⣤⣿⣿⣿⠟⢋⣡⣶⣿⠋⢀⠀⠀⠀⡀⠀⠀⢀⡌⠘⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-"""
+ \033[34mby DecaySec\033[31m
+                                                    
+\033[0;0;0m"""
 
 class clr:
     BLACK   = '\033[30m'
@@ -149,4 +151,27 @@ class PortScanner:
 
 
     def _register_open(self, port: int):    
-        print(f'{clr.GREEN}[+] Open port found: {port}{clr.RESET}')
+        print(f'{clr.BOLD}{clr.GREEN}[+]{clr.RESET} {clr.CYAN}{port:<5}{clr.RESET} → Open')
+        with self.result_lock:
+            self.open_ports.append(port)
+        
+        if self.output:
+            with self.file_lock:
+                with open(self.output, 'a') as fh:
+                    fh.write(f'{port}\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    main()
