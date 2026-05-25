@@ -160,18 +160,36 @@ class PortScanner:
                 with open(self.output, 'a') as fh:
                     fh.write(f'{port}\n')
 
+def main():
+    print(ART)
+    start = time.time()
+    args = parse_args()
 
+    print(f'\n{clr.YELLOW} [ PINGING ON DOMAIN... ]{clr.RESET}')
+    timeout_ms = args.timeout if args.timeout else get_timeout(args.host)
 
+    print(f'Domain  = {clr.MAGENTA}{args.host}{clr.RESET}')
+    print(f'Timeout = {clr.MAGENTA}{timeout_ms}{clr.RESET} ms')
+    print(f'Threads = {clr.MAGENTA}{args.threads}{clr.RESET}')
+    print(f'\n{clr.YELLOW} [   RESULTS   ]{clr.RESET}')
 
+    scanner = PortScanner(
+        host=args.host,
+        timeout_ms=timeout_ms,
+        num_threads=args.threads,
+        output=args.output,
+        use_top10k=args.top10k
+    )
+    open_ports = scanner.run()
 
+    elapsed = time.time() - start
+    port_count = '10000' if args.top10k else '1000'
 
-
-
-
-
-
-
-
+    print(f'\n{clr.BOLD}{clr.GREEN}[#]{clr.RESET} {clr.MAGENTA}{len(open_ports)}{clr.RESET} Open ports')
+    print(f'{clr.BOLD}{clr.YELLOW}[i]{clr.RESET} {clr.MAGENTA}{port_count}{clr.RESET} Scanned Ports')
+    if args.output:
+        print(f'\n{clr.BOLD}{clr.GREEN}[*]{clr.RESET} Exported to {clr.CYAN}{args.output}{clr.RESET}')
+    print(f'\n{clr.BOLD}{clr.YELLOW}[i]{clr.RESET} Execution Time: {elapsed:,.3f} seconds\n')
 
 if __name__ == '__main__':
     main()
